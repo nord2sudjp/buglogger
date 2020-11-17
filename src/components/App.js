@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Table from "react-bootstrap/Table";
+import Alert from "react-bootstrap/Alert";
 import AddLogItem from "./AddLogItem";
 import LogItem from "./LogItem";
 const App = () => {
@@ -28,14 +29,23 @@ const App = () => {
     },
   ]);
 
-  function addItem(item) {
-    console.log(item)
-  }
+  const [alert, setAlert] = useState({
+    show: false,
+    message: "",
+    variant: "success",
+  });
 
+  function addItem(item) {
+    //console.log(item)
+    item._id = (Math.floor(Math.random() * 90000) + 10) ^ 4;
+    item.created = new Date().toString();
+    setLogs([...logs, item]);
+  }
 
   return (
     <Container>
       <AddLogItem addItem={addItem} />
+      {alert.show && <Alert variant={alert.variant}>{alert.message}</Alert>}
       <Table>
         <thead>
           <tr>
