@@ -77,15 +77,35 @@ async function sendLogs() {
   try {
     const logs = await Log.find().sort({ created: 1 });
     console.log("sendLogs: ", logs);
-    mainWindow.webContens.send("logs:get", JSON.stringigy(logs));
+    mainWindow.webContents.send("logs:get", JSON.stringify(logs));
   } catch (err) {
     console.log(err);
   }
 }
 
-ipcMain.on("logs:add", (e, item) => {
+ipcMain.on("logs:add", async (e, item) => {
   console.log("logs@add:", item);
+  try {
+    await Log.create(item);
+    sendLogs()
+  } catch (err) { console.log("logs@add:", err) }
 });
+
+ipcMain.on("logs:delete", async (e, _id) => {
+  console.log("logs@delete:", _id)
+  try {
+    await Log.findOneAndDelete({ _id: _id })
+    sendLogs()
+  } catch (err) {
+    console.log("logs@delete:", err)
+
+
+  }
+
+
+});
+
+
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
