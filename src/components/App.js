@@ -41,7 +41,7 @@ const App = () => {
         </thead>
         <tbody>
           {logs.map((log) => (
-            <LogItem />
+            <LogItem key={log._id} log={log} />
           ))}
         </tbody>
       </Table>
