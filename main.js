@@ -84,7 +84,7 @@ async function sendLogs() {
 }
 
 ipcMain.on("logs:add", (e, item) => {
-  console.log("logs@add:");
+  console.log("logs@add:", item);
 });
 
 app.on("window-all-closed", () => {
