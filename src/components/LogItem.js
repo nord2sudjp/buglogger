@@ -15,7 +15,9 @@ const LogItem = ({ log: { _id, priority, user, text, created } }) => {
   return (
     <tr>
       <td>
-        <Badge variant={setVariant()}>{priority}</Badge>
+        <Badge variant={setVariant()} className="p-2">
+          {priority.charAt(0).toUpperCase() + priority.slice(1)}
+        </Badge>
       </td>
       <td>{text}</td>
       <td>{user}</td>
