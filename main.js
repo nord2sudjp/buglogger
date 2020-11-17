@@ -1,6 +1,6 @@
 const path = require("path");
 const url = require("url");
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, Menu } = require("electron");
 const connectDB = require("./config/db.js");
 const Log = require("./models/Log.js");
 
@@ -9,6 +9,8 @@ connectDB();
 let mainWindow;
 
 let isDev = false;
+
+const isMac = process.platform == "darwin" ? true : false;
 
 if (
   process.env.NODE_ENV !== undefined &&
@@ -69,9 +71,52 @@ function createMainWindow() {
   mainWindow.on("closed", () => (mainWindow = null));
 }
 
-app.on("ready", createMainWindow);
+app.on("ready", () => {
+  createMainWindow();
+  const mainMenu = Menu.buildFromTemplate(menu);
+  Menu.setApplicationMenu(mainMenu);
+});
+
+const menu = [
+  ...(isMac ? [{ role: "appMenu" }] : []),
+  { role: "fileMenu" },
+  { role: "editMenu" },
+  {
+    label: "Logs",
+    submenu: [{ label: "Clear Logs", click: () => clearLogs() }],
+  },
+  {
+    label: "Developer",
+    submenu: [
+      { role: "reload" },
+      { role: "forcereload" },
+      { role: "separator" },
+      { role: "toggledevtools" },
+    ],
+  },
+];
 
 ipcMain.on("logs:load", sendLogs);
+
+ipcMain.on("logs:add", async (e, item) => {
+  console.log("logs@add:", item);
+  try {
+    await Log.create(item);
+    sendLogs();
+  } catch (err) {
+    console.log("logs@add:", err);
+  }
+});
+
+ipcMain.on("logs:delete", async (e, _id) => {
+  console.log("logs@delete:", _id);
+  try {
+    await Log.findOneAndDelete({ _id: _id });
+    sendLogs();
+  } catch (err) {
+    console.log("logs@delete:", err);
+  }
+});
 
 async function sendLogs() {
   try {
@@ -83,29 +128,14 @@ async function sendLogs() {
   }
 }
 
-ipcMain.on("logs:add", async (e, item) => {
-  console.log("logs@add:", item);
+async function clearLogs() {
   try {
-    await Log.create(item);
-    sendLogs()
-  } catch (err) { console.log("logs@add:", err) }
-});
-
-ipcMain.on("logs:delete", async (e, _id) => {
-  console.log("logs@delete:", _id)
-  try {
-    await Log.findOneAndDelete({ _id: _id })
-    sendLogs()
+    await Log.deleteMany({});
+    mainWindow.webContents.send("logs:clear");
   } catch (err) {
-    console.log("logs@delete:", err)
-
-
+    console.log("clearLogs:", err);
   }
-
-
-});
-
-
+}
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
