@@ -5,16 +5,22 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
 
-const AddLogItem = () => {
+const AddLogItem = ({ addItem }) => {
   const [text, setText] = useState("");
   const [user, setUser] = useState("");
   const [priority, setPriority] = useState("");
-
+  const onSubmit = (e) => {
+    e.preventDefault();
+    addItem({ text, user, priority });
+    setText("");
+    setUser("");
+    setPriority("");
+  };
   return (
     <div>
       <Card className="mt-5 mb-3">
         <Card.Body>
-          <Form>
+          <Form onSubmit={onSubmit}>
             <Row className="my-3">
               <Col>
                 <Form.Control

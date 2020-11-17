@@ -28,9 +28,14 @@ const App = () => {
     },
   ]);
 
+  function addItem(item) {
+    console.log(item)
+  }
+
+
   return (
     <Container>
-      <AddLogItem />
+      <AddLogItem addItem={addItem} />
       <Table>
         <thead>
           <tr>
