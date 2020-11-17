@@ -30,10 +30,13 @@ const App = () => {
       showAlert("Please enter all fields", "danger");
       return false;
     }
+
     //console.log(item)
-    item._id = (Math.floor(Math.random() * 90000) + 10) ^ 4;
-    item.created = new Date().toString();
-    setLogs([...logs, item]);
+    // item._id = (Math.floor(Math.random() * 90000) + 10) ^ 4;
+    // item.created = new Date().toString();
+    // setLogs([...logs, item]);
+    ipcRenderer.send("logs:add", item);
+
     showAlert("Log Added");
   }
 
